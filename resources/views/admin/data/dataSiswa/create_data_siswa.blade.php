@@ -16,7 +16,6 @@
             </ul>
         @endif
 
-        {{-- token syarat untuk mengirim data (sistem membaca bahwa data ini berasal dari sumber yang sah) --}}
         @csrf
         <div class="mb-3 row">
             <label for="nis" class="col-sm-2 col-form-label">Nis</label>
