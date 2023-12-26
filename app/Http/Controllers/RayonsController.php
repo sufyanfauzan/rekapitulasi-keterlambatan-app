@@ -11,12 +11,24 @@ class RayonsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $rayons = Rayons::OrderBy('rayon', 'ASC')->simplePaginate(5);
-        // $user = User::orderBy('name', 'ASC')->simplePaginate(5);
-        $users = User::where('role', 'ps')->get();
-        return view('admin.data.dataRayon.data_rayon', compact('rayons', 'users'));
+        $search = $request->input('search');
+
+        // Mendapatkan nilai perPage dari formulir atau menggunakan nilai default (5)
+        $perPage = $request->input('perPage', 5);
+
+        $rayons = Rayons::with('user')
+            ->where(function ($query) use ($search) {
+                $query->where('rayon', 'LIKE', '%' . $search . '%');
+                $query->orWhereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('name', 'LIKE', '%' . $search . '%');
+                });
+            })
+            ->orderBy('created_at', 'ASC')
+            ->simplePaginate($perPage);
+
+        return view('admin.data.dataRayon.data_rayon', compact('rayons', 'search', 'perPage'));
     }
 
     /**
@@ -43,7 +55,7 @@ class RayonsController extends Controller
             'user_id' => $request->user_id,
         ]);
 
-        return redirect()->back()->with('success', 'Berhasil menambahkan data!');
+        return redirect()->route('rayon.index')->with('success', 'Berhasil menambahkan data!');
     }
 
     /**

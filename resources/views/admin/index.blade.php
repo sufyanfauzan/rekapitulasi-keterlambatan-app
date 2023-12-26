@@ -2,7 +2,10 @@
 @section('content')
     <div class="row">
         <h2>Dashboard</h2>
-        <p>Home / Dashboard</p>
+        <p>Dashboard</p>
+        @if (Session::get('failed'))
+            <div class="alert alert-danger mt-2 mb-4">{{ Session::get('failed') }}</div>
+        @endif
         <div class="col-md-5">
             <div class="card p-4">
                 <h4 class="card-title"> Peserta Didik</h4>

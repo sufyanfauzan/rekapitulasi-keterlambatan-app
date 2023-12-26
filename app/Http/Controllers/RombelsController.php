@@ -10,10 +10,20 @@ class RombelsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {   
-        $rombels = rombels::orderBy('rombel', 'ASC')->simplePaginate(5);
-        return view('admin.data.dataRombel.data_rombel', compact('rombels'));
+    public function index(Request $request)
+    {
+        $search = $request->input('search');
+        
+        $perPage = $request->input('perPage', 5);
+        if ($search) {
+            $rombels = Rombels::where('rombel', 'LIKE', '%' . $search . '%')
+                ->orderBy('created_at', 'ASC')
+                ->simplePaginate($perPage);
+        } else {
+            $rombels = Rombels::orderBy('created_at', 'ASC')->simplePaginate($perPage);
+        }
+
+        return view('admin.data.dataRombel.data_rombel', compact('rombels', 'search', 'perPage'));
     }
 
     /**
@@ -34,10 +44,10 @@ class RombelsController extends Controller
         ]);
 
         Rombels::create([
-           'rombel' => $request->rombel,
+            'rombel' => $request->rombel,
         ]);
 
-        return redirect()->back()->with('success', 'Berhasil menambahkan data!');
+        return redirect()->route('rombel.index')->with('success', 'Berhasil menambahkan data!');
     }
 
     /**
@@ -67,7 +77,7 @@ class RombelsController extends Controller
         ]);
 
         $id->update([
-           'rombel' => $request->rombel,
+            'rombel' => $request->rombel,
         ]);
 
         return redirect()->route('rombel.index')->with('success', 'Berhasil mengubah data!');

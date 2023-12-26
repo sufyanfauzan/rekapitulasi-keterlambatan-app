@@ -2,8 +2,11 @@
 
 @section('content')
     <h2>Edit Data Rayon</h2>
-    <p>Home / Data Rayon / Edit Data Rayon</p>
-    <form action="{{ route('rayon.update', $rayons['id']) }}" method="POST" class="card p-5">
+    <p><a href="{{ route('admin.index') }}">Dashboard</a> / <a href="{{ route('rayon.index') }}">Data Rayon</a> / Edit Data Rayon</p>
+    <div class="d-flex justify-content-end">
+        <a class="btn btn-secondary me-2" href="{{ route('rayon.index') }}">Kembali</a></button>
+    </div>
+    <form action="{{ route('rayon.update', $rayons['id']) }}" method="POST" class="card mt-3 p-5">
         @csrf
         @method('PATCH')
 

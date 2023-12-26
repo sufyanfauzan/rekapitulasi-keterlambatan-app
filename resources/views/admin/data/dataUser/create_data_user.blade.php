@@ -2,43 +2,41 @@
 
 @section('content')
     <h2>Tambah Data User</h2>
-    <p>Home / Data User / Tambah Data User</p>
+    <p><a href="{{ route('admin.index') }}">Dashboard</a> / <a href="{{ route('user.index') }}">Data User</a> / Tambah Data User</p>
+    <div class="d-flex justify-content-end">
+        <a class="btn btn-secondary me-2" href="{{ route('user.index') }}">Kembali</a></button>
+    </div>
     <form action="{{ route('user.store') }}" class="card mt-3 p-5" method="POST">
-        @if (Session::get('success'))
-            <div class="alert alert-success">{{ Session::get('success') }}</div>
+
+        @if ($errors->any())
+            <ul class="alert alert-danger">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         @endif
 
-        {{-- token syarat untuk mengirim data (sistem membaca bahwa data ini berasal dari sumber yang sah) --}}
         @csrf
         <div class="mb-3 row">
-            <label for="name" class="col-sm-2 col-form-label @error('name') is-invalid @enderror">Nama</label>
+            <label for="name" class="col-sm-2 col-form-label">Nama</label>
             <div class="col-sm-10">
                 <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}">
-                @error('name')
-                    <div class="text-danger">{{ $message }}</div>
-                @enderror
             </div>
         </div>
         <div class="mb-3 row">
-            <label for="email" class="col-sm-2 col-form-label @error('email') is-invalid @enderror">Email</label>
+            <label for="email" class="col-sm-2 col-form-label">Email</label>
             <div class="col-sm-10">
                 <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}">
-                @error('email')
-                    <div class="text-danger">{{ $message }}</div>
-                @enderror
             </div>
         </div>
         <div class="mb-3 row">
-            <label for="role" class="col-sm-2 col-form-label @error('role') is-invalid @enderror">Role</label>
+            <label for="role" class="col-sm-2 col-form-label">Role</label>
             <div class="col-sm-10">
                 <select name="role" id="role" class="form-control">
                     <option selected hidden disabled>Tipe Role</option>
                     <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                     <option value="ps" {{ old('role') == 'ps' ? 'selected' : '' }}>Pembimbing Siswa</option>
                 </select>
-                @error('role')
-                    <div class="text-danger">{{ $message }}</div>
-                @enderror
             </div>
         </div>
         <button type="submit" class="btn btn-primary">Kirim Data</button>

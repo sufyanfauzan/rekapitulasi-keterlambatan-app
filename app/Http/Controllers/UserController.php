@@ -9,10 +9,28 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $user = User::orderBy('created_at', 'ASC')->simplePaginate(5);
-        return view('admin.data.dataUser.data_user', compact('user'));
+        $search = $request->input('search');
+
+        // Mendapatkan nilai perPage dari formulir atau menggunakan nilai default (5)
+        $perPage = $request->input('perPage', 5);
+
+        if ($search) {
+            $users = User::where('name', 'LIKE', '%' . $search . '%')
+                ->orWhere('email', 'LIKE', '%' . $search . '%')
+                ->orWhere('role', 'LIKE', '%' . $search . '%')
+                ->orderBy('created_at', 'ASC')
+                ->simplePaginate($perPage);
+
+           
+        } else {
+            $users = User::orderBy('created_at', 'ASC')->simplePaginate($perPage);
+
+            
+        }
+
+        return view('admin.data.dataUser.data_user', compact('users', 'search', 'perPage'));
     }
 
     public function loginAuth(Request $request)
@@ -33,8 +51,7 @@ class UserController extends Controller
             } elseif ($role === 'ps') {
                 return redirect('/dashboard/ps');
             } else {
-                // Handle other roles or scenarios
-                return redirect('/dashboard');
+                return redirect('/');
             }
         } else {
             return redirect()->back()->with('failed', 'Email / Password salah, silahkan coba lagi');
@@ -71,7 +88,7 @@ class UserController extends Controller
             'password' => bcrypt($defaultPassword)
         ]);
 
-        return redirect()->back()->with('success', 'Berhasil menambahkan data!');
+        return redirect()->route('user.index')->with('success', 'Berhasil menambahkan data!');
     }
 
     public function edit($id)
@@ -93,7 +110,7 @@ class UserController extends Controller
             'email' => $request->input('email'),
             'role' => $request->input('role'),
         ];
-        
+
         // form name pass 
         if ($request->filled('pass')) {
             $dataToUpdate['password'] = bcrypt($request->input('pass'));

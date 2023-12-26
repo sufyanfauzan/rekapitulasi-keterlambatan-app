@@ -105,9 +105,9 @@
                         <li class="nav-item dropdown">
                             <a href="#" data-bs-toggle="dropdown" class="nav-icon pe-md-0">
                                 @if (Auth::user()->role == 'admin')
-                                Admin 🔽
+                                Admin &#9660;
                                 @else
-                                Ps 🔽
+                                Ps &#9660;
                                 @endif
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">

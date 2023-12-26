@@ -13,14 +13,33 @@ class StudentsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $students = students::all();
-        $rayons = Rayons::all();
-        $rombels = Rombels::all();
-        
-        return view('admin.data.dataSiswa.data_siswa', compact('rayons', 'rombels', 'students'));
-    }
+    
+     public function index(Request $request)
+     {
+         $search = $request->input('search');
+     
+         // Mendapatkan nilai perPage dari formulir atau menggunakan nilai default (5)
+         $perPage = $request->input('perPage', 5);
+     
+         $students = Students::with(['rayons', 'rombels'])
+             ->where(function ($query) use ($search) {
+                 $query->where('nis', 'LIKE', '%' . $search . '%')
+                     ->orWhere('name', 'LIKE', '%' . $search . '%')
+                     ->orWhereHas('rayons', function ($rayonQuery) use ($search) {
+                         $rayonQuery->where('rayon', 'LIKE', '%' . $search . '%');
+                     })
+                     ->orWhereHas('rombels', function ($rombelQuery) use ($search) {
+                         $rombelQuery->where('rombel', 'LIKE', '%' . $search . '%');
+                     });
+             })
+             ->orderBy('created_at', 'ASC')
+             ->simplePaginate($perPage);
+     
+         $rayons = Rayons::all();
+         $rombels = Rombels::all();
+     
+         return view('admin.data.dataSiswa.data_siswa', compact('rayons', 'rombels', 'students', 'search', 'perPage'));
+     }      
 
     /**
      * Show the form for creating a new resource.
@@ -52,7 +71,7 @@ class StudentsController extends Controller
             'rombel_id' => $request->rombel_id,
         ]);
 
-        return redirect()->back()->with('success', 'Berhasil menambahkan data!');
+        return redirect()->route('siswa.index')->with('success', 'Berhasil menambahkan data!');
     }
 
     /**
@@ -69,7 +88,7 @@ class StudentsController extends Controller
     public function edit($id)
     {
         $students = Students::find($id);
-        $rombels = Rombels::all(); 
+        $rombels = Rombels::all();
         $rayons = Rayons::all();
         return view('admin.data.dataSiswa.edit_data_siswa', compact('students', 'rombels', 'rayons'));
     }
@@ -105,16 +124,16 @@ class StudentsController extends Controller
         //
     }
 
-    public function indexSiswa() {
+    public function indexSiswa()
+    {
         $userIdLogin = Auth::id();
         $rayonIdLogin = rayons::where('user_id', $userIdLogin)->value('id');
-    
+
         // Menggunakan metode get() untuk mendapatkan koleksi data siswa
         $students = students::with('rayons', 'rombels')
             ->where('rayon_id', $rayonIdLogin)
             ->get();
-    
+
         return view('PS.dataSiswa.data_user_ps', compact('students'));
     }
-    
 }
