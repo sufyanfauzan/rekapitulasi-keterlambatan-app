@@ -91,6 +91,9 @@ Route::middleware(['isLogin'])->group(function () {
         });
         Route::prefix('data.terlambat.Ps')->name('terlambatPs.')->group(function () {
             Route::get('/', [LatesController::class, 'indexSiswa'])->name('indexPs');
+            Route::get('/show/{student_id}', [LatesController::class, 'show'])->name('showPs');
+            Route::post('/terlambatCetakPdf/{studentId}', [LatesController::class, 'cetakPdf'])->name('terlambatCetakPdf');
+            Route::get('/export', [LatesController::class, 'export'])->name('export');
         });
     });
 });

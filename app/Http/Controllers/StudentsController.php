@@ -13,33 +13,33 @@ class StudentsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    
-     public function index(Request $request)
-     {
-         $search = $request->input('search');
-     
-         // Mendapatkan nilai perPage dari formulir atau menggunakan nilai default (5)
-         $perPage = $request->input('perPage', 5);
-     
-         $students = Students::with(['rayons', 'rombels'])
-             ->where(function ($query) use ($search) {
-                 $query->where('nis', 'LIKE', '%' . $search . '%')
-                     ->orWhere('name', 'LIKE', '%' . $search . '%')
-                     ->orWhereHas('rayons', function ($rayonQuery) use ($search) {
-                         $rayonQuery->where('rayon', 'LIKE', '%' . $search . '%');
-                     })
-                     ->orWhereHas('rombels', function ($rombelQuery) use ($search) {
-                         $rombelQuery->where('rombel', 'LIKE', '%' . $search . '%');
-                     });
-             })
-             ->orderBy('created_at', 'ASC')
-             ->simplePaginate($perPage);
-     
-         $rayons = Rayons::all();
-         $rombels = Rombels::all();
-     
-         return view('admin.data.dataSiswa.data_siswa', compact('rayons', 'rombels', 'students', 'search', 'perPage'));
-     }      
+
+    public function index(Request $request)
+    {
+        $search = $request->input('search');
+
+        // Mendapatkan nilai perPage dari formulir atau menggunakan nilai default (5)
+        $perPage = $request->input('perPage', 5);
+
+        $students = Students::with(['rayons', 'rombels'])
+            ->where(function ($query) use ($search) {
+                $query->where('nis', 'LIKE', '%' . $search . '%')
+                    ->orWhere('name', 'LIKE', '%' . $search . '%')
+                    ->orWhereHas('rayons', function ($rayonQuery) use ($search) {
+                        $rayonQuery->where('rayon', 'LIKE', '%' . $search . '%');
+                    })
+                    ->orWhereHas('rombels', function ($rombelQuery) use ($search) {
+                        $rombelQuery->where('rombel', 'LIKE', '%' . $search . '%');
+                    });
+            })
+            ->orderBy('created_at', 'ASC')
+            ->simplePaginate($perPage);
+
+        $rayons = Rayons::all();
+        $rombels = Rombels::all();
+
+        return view('admin.data.dataSiswa.data_siswa', compact('rayons', 'rombels', 'students', 'search', 'perPage'));
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -124,16 +124,38 @@ class StudentsController extends Controller
         //
     }
 
-    public function indexSiswa()
+    public function indexSiswa(Request $request)
     {
         $userIdLogin = Auth::id();
         $rayonIdLogin = rayons::where('user_id', $userIdLogin)->value('id');
 
-        // Menggunakan metode get() untuk mendapatkan koleksi data siswa
+        // Mendapatkan nilai perPage dari formulir atau menggunakan nilai default (5)
+        $perPage = $request->input('perPage', 5);
+        $search = $request->input('search');
+
         $students = students::with('rayons', 'rombels')
             ->where('rayon_id', $rayonIdLogin)
-            ->get();
+            ->when($search, function ($query) use ($search) {
+                $query->where('nis', 'LIKE', '%' . $search . '%')
+                    ->orWhere('name', 'LIKE', '%' . $search . '%');
+            })
+            ->orderBy('created_at', 'ASC')
+            ->paginate($perPage);
 
-        return view('PS.dataSiswa.data_user_ps', compact('students'));
+        return view('PS.dataSiswa.data_user_ps', compact('students', 'perPage', 'search'));
     }
+
+
+    // public function indexSiswa()
+    // {
+    //     $userIdLogin = Auth::id();
+    //     $rayonIdLogin = rayons::where('user_id', $userIdLogin)->value('id');
+
+    //     // Menggunakan metode get() untuk mendapatkan koleksi data siswa
+    //     $students = students::with('rayons', 'rombels')
+    //         ->where('rayon_id', $rayonIdLogin)
+    //         ->get();
+
+    //     return view('PS.dataSiswa.data_user_ps', compact('students'));
+    // }
 }

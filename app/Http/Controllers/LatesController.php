@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use PDF;
 use Excel;
 use App\Exports\LatesExport;
+use App\Exports\LatesExportPs;
 use Illuminate\Support\Facades\Auth;
 
 class LatesController extends Controller
@@ -84,8 +85,13 @@ class LatesController extends Controller
     {
         $student = students::find($student_id);
         $lates = lates::where('student_id', $student_id)->get();
+        $role = auth()->user()->role;
 
-        return view('admin.data.dataTerlambat.show_data_terlambat', compact('lates', 'student'));
+        if ($role === 'admin') {
+           return view('admin.data.dataTerlambat.show_data_terlambat', compact('lates', 'student'));
+        } else {
+            return view('PS.dataTerlambat.show_data_terlambat_ps', compact('lates', 'student'));
+        }
     }
 
 
@@ -158,27 +164,46 @@ class LatesController extends Controller
 
     public function export()
     {
-        return Excel::download(new LatesExport, 'keterlambatan.xlsx');
+        $role = auth()->user()->role;
+
+        if ($role === 'admin') {
+            return Excel::download(new LatesExport, 'keterlambatan.xlsx');
+        } else {
+            $userIdLogin = Auth::id();
+            $rayonIdLogin = rayons::where('user_id', $userIdLogin)->value('id');
+
+            return Excel::download(new LatesExportPs($userIdLogin, $rayonIdLogin), 'keterlambatan.xlsx');
+        }
     }
 
-    public function indexSiswa()
+
+    public function indexSiswa(Request $request)
     {
         $userIdLogin = Auth::id();
         $rayonIdLogin = rayons::where('user_id', $userIdLogin)->value('id');
 
-        // Get students in the specified rayon with late information
-        $students = students::with(['rayons', 'rombels'])
-            ->where('rayon_id', $rayonIdLogin)
-            ->get();
+        $perPage = $request->input('perPage', 5);
+        $search = $request->input('search');
 
-        // Fetch late information for each student in the specified rayon
+        // query dasar untuk data siswa
+        $query = students::with(['rayons', 'rombels'])
+            ->where('rayon_id', $rayonIdLogin);
+
+        $query->when($search, function ($query) use ($search) {
+            $query->where('nis', 'LIKE', '%' . $search . '%')
+                ->orWhere('name', 'LIKE', '%' . $search . '%');
+        });
+
+        $students = $query->get();
+
         $students->each(function ($student) {
             $student->lates = lates::where('student_id', $student->id)->get();
         });
 
-        // Filter late information to include only the ones in the specified rayon
-        $lates = lates::whereIn('student_id', $students->pluck('id'))->get();
+        $latesQuery = lates::whereIn('student_id', $students->pluck('id'))->orderBy('created_at', 'ASC');
 
-        return view('PS.dataTerlambat.data_terlambat_ps', compact('students', 'lates'));
+        $lates = ($perPage === 'all') ? $latesQuery->get() : $latesQuery->simplePaginate($perPage);
+
+        return view('PS.dataTerlambat.data_terlambat_ps', compact('students', 'lates', 'search', 'perPage'));
     }
 }

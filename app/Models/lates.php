@@ -28,4 +28,9 @@ class lates extends Model
     {
         return $this->hasMany(lates::class, 'student_id');
     }
+
+    public function rayons()
+    {
+        return $this->belongsTo(Rayons::class, 'rayon_id');
+    }
 }
