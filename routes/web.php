@@ -72,6 +72,7 @@ Route::middleware(['isLogin'])->group(function () {
             Route::post('/store', [StudentsController::class, 'store'])->name('store');
             Route::get('/edit/{id}', [StudentsController::class, 'edit'])->name('edit');
             Route::patch('/update/{id}', [StudentsController::class, 'update'])->name('update');
+            Route::delete('/delete/{id}', [StudentsController::class, 'destroy'])->name('delete');
         });
         Route::prefix('data.terlambat')->name('terlambat.')->group(function () {
             Route::get('/', [LatesController::class, 'index'])->name('index');
@@ -79,6 +80,7 @@ Route::middleware(['isLogin'])->group(function () {
             Route::post('/store', [LatesController::class, 'store'])->name('store');
             Route::get('/edit/{id}', [LatesController::class, 'edit'])->name('edit');
             Route::patch('/update/{id}', [LatesController::class, 'update'])->name('update');
+            Route::delete('/delete/{id}', [latesController::class, 'destroy'])->name('delete');
             Route::get('/show/{student_id}', [LatesController::class, 'show'])->name('show');
             Route::post('/terlambatCetakPdf/{studentId}', [LatesController::class, 'cetakPdf'])->name('terlambatCetakPdf');
             Route::get('/export', [LatesController::class, 'export'])->name('export');

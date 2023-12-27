@@ -119,9 +119,11 @@ class StudentsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(students $students)
+    public function destroy($id)
     {
-        //
+        Students::where('id', $id)->delete();
+
+        return redirect()->back()->with('deleted', 'Berhasil menghapus data!');
     }
 
     public function indexSiswa(Request $request)

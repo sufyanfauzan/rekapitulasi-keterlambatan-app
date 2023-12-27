@@ -59,7 +59,7 @@
                         <td class="d-flex">
                             <a href="{{ route('siswa.edit', $item['id']) }}" class="btn btn-primary me-2"><i
                                     class="fas fa-edit"></i></a>
-                            <form action="{{ route('rombel.delete', $item['id']) }}" method="post">
+                            <form action="{{ route('siswa.delete', $item['id']) }}" method="post">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-danger" onclick="return confirm('Hapus Data?');"><i

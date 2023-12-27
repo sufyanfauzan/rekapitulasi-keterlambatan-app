@@ -142,9 +142,11 @@ class LatesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(lates $lates)
+    public function destroy($id)
     {
-        //
+        lates::where('id', $id)->delete();
+
+        return redirect()->back()->with('deleted', 'Berhasil menghapus data!');
     }
 
     public function cetakPdf($studentId)
