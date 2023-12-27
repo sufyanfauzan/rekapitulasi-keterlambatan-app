@@ -16,13 +16,28 @@ class LatesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $lates = lates::all();
-        // $lates = lates::with('student.lates')->get();
-        $students = students::all();
-        return view('admin.data.dataTerlambat.data_terlambat', compact('lates', 'students'));
+        $search = $request->input('search');
+        $perPage = $request->input('perPage', 5);
+
+        $query = Lates::with('student')
+            ->where(function ($query) use ($search) {
+                $query->whereHas('student', function ($studentQuery) use ($search) {
+                    $studentQuery->where('nis', 'LIKE', '%' . $search . '%')
+                        ->orWhere('name', 'LIKE', '%' . $search . '%');
+                });
+            })
+            ->orderBy('created_at', 'ASC');
+
+        $lates = ($perPage === 'all') ? $query->get() : $query->simplePaginate($perPage);
+
+        $students = Students::all();
+
+        return view('admin.data.dataTerlambat.data_terlambat', compact('lates', 'students', 'search', 'perPage'));
     }
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -58,7 +73,7 @@ class LatesController extends Controller
 
         Lates::create($data);
 
-        return redirect()->back()->with('success', 'Berhasil menambahkan data!');
+        return redirect()->route('terlambat.index')->with('success', 'Berhasil menambahkan data!');
     }
 
 

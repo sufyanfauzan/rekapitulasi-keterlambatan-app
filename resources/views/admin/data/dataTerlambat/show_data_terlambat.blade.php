@@ -2,7 +2,7 @@
 
 @section('content')
 <h2>Detail Data Keterlambatan</h2>
-<p>Home / Data Keterlambatan / Detail Data Keterlambatan</p>
+<p><a href="{{ route('admin.index') }}">Dashboard</a> / <a href="{{ route('terlambat.index') }}">Data Keterlambatan</a> / Detail Data Keterlambatan</p>
 <br>
 <h5>{{ $student->nis }} | {{ $student->name }} | {{ $student->rombels->rombel }} | {{ $student->rayons->rayon }}</h5>
 <div class="row mt-5">
