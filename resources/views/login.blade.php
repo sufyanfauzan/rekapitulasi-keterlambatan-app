@@ -8,53 +8,7 @@
     <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #ececec;
-        }
-
-        .box-area {
-            width: 930px;
-        }
-
-        .right-box {
-            padding: 40px 30px 40px 40px;
-        }
-
-        ::placeholder {
-            font-size: 16px;
-        }
-
-        .rounded-4 {
-            border-radius: 20px;
-        }
-
-        .rounded-5 {
-            border-radius: 30px;
-        }
-
-        @media only screen and (max-width: 768px) {
-
-            .box-area {
-                margin: 0 10px;
-
-            }
-
-            .left-box {
-                height: 100px;
-                overflow: hidden;
-            }
-
-            .right-box {
-                padding: 20px;
-            }
-
-        }
-    </style>
+    <link rel="stylesheet" href="{{ URL('assets/css/login.css') }} ">
 </head>
 
 <body>
@@ -78,7 +32,7 @@
                             <div class="alert alert-danger mt-3">{{ Session::get('failed') }}</div>
                         @endif
                         <div class="input-group mb-3 mt-5">
-                            <input type="text" name="email" class="form-control form-control-lg bg-light fs-6"
+                            <input type="email" name="email" class="form-control form-control-lg bg-light fs-6"
                                 placeholder="Email" @error('email') is-invalid @enderror>
                         </div>
                         @error('email')
