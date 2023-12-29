@@ -65,7 +65,7 @@ class LatesController extends Controller
 
         if ($request->hasFile('bukti')) {
             $file = $request->file('bukti');
-            $filename = $file->getClientOriginalName();
+            $filename = $file->hashName();
             $file->storeAs('images', $filename, 'public');
             $data['bukti'] = $filename;
         }
