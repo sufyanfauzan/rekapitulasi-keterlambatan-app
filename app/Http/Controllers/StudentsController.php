@@ -121,10 +121,12 @@ class StudentsController extends Controller
      */
     public function destroy($id)
     {
-        Students::where('id', $id)->delete();
+        $student = Students::findOrFail($id);
+        $student->delete();
 
         return redirect()->back()->with('deleted', 'Berhasil menghapus data!');
     }
+
 
     public function indexSiswa(Request $request)
     {
